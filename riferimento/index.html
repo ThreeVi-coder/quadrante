@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Il Quadrante</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nero:#0D0D0D; --carta:#EFE5D2; --camello:#D6A75F;
+  --oro:#C28D39; --bordeaux:#710912; --espresso:#362822;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --tec:ui-sans-serif,system-ui,sans-serif;
+  --arcoG:path("M0 160 L0 58 Q0 18 50 0 Q100 18 100 58 L100 160Z");
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--nero);color:var(--espresso);font-family:var(--serif);
+  overflow-x:hidden;scroll-snap-type:y proximity}
+.tec{font-family:var(--tec);text-transform:uppercase;letter-spacing:.3em;font-size:.6rem}
+
+#grana{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:.3;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}
+
+/* ═══════ INGRESSO ═══════ */
+#ingresso{position:relative;height:100svh;background:var(--nero);
+  scroll-snap-align:start;overflow:hidden}
+#ingresso>svg.palco{position:absolute;inset:0;width:100%;height:100%;display:block}
+#ingresso::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4.5vh;
+  background:linear-gradient(transparent,rgba(239,229,210,.42));opacity:0;
+  animation:affiora 1.2s 2.4s ease forwards;pointer-events:none}
+@keyframes affiora{to{opacity:1}}
+
+.bordo{position:absolute;inset:22px;border:1px solid rgba(239,229,210,.13);
+  pointer-events:none;z-index:2;opacity:0;animation:sfuma 1.4s 2.2s ease forwards}
+@keyframes sfuma{to{opacity:1}}
+
+.linea{fill:none;stroke:#F6EEDF;stroke-width:1.2;vector-effect:non-scaling-stroke;
+  stroke-dasharray:1400;stroke-dashoffset:1400;animation:incidi 1s cubic-bezier(.65,0,.3,1) forwards}
+.l2{animation-delay:.1s} .l3{animation-delay:.2s}
+@keyframes incidi{to{stroke-dashoffset:0}}
+.cartone{fill:var(--nero);transform-origin:50% 100%;
+  animation:estrai .95s 1.25s cubic-bezier(.4,0,.2,1) forwards}
+.c2{animation-delay:1.35s} .c3{animation-delay:1.45s}
+@keyframes estrai{0%{transform:translateY(0);opacity:1}
+  22%{transform:translateY(-1.1%);opacity:1}
+  100%{transform:translateY(-8%) scale(1.025);opacity:0}}
+
+.insegna{position:absolute;left:5.2vw;top:7.2vh;z-index:3;pointer-events:none}
+.titolo{font-size:clamp(1.9rem,3.5vw,3rem);font-weight:300;letter-spacing:.17em;
+  text-indent:.17em;color:var(--carta);opacity:0;
+  animation:sali 1s 1.9s cubic-bezier(.2,.8,.3,1) forwards}
+.sotto{color:var(--oro);margin-top:.95rem;opacity:0;
+  animation:sali 1s 2.1s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes sali{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.angolo{position:absolute;z-index:3;color:rgba(239,229,210,.42);opacity:0;
+  animation:sfuma 1.2s 2.5s ease forwards;pointer-events:none}
+.angolo.dx{right:5.2vw;top:7.6vh;text-align:right;line-height:2}
+.emblema{position:absolute;left:50%;top:5.4vh;transform:translateX(-50%);z-index:3;
+  width:34px;opacity:0;animation:sfuma 1.2s 2.3s ease forwards}
+.emblema path,.emblema circle{stroke:rgba(239,229,210,.5);fill:none;stroke-width:1}
+
+.piede{position:absolute;left:0;right:0;bottom:3.4vh;z-index:4;display:flex;
+  align-items:center;justify-content:center;gap:1.8rem;opacity:0;
+  animation:sali 1s 2.9s ease forwards}
+.trat{width:84px;height:1px;background:rgba(239,229,210,.28)}
+.freccia{background:none;border:0;cursor:pointer;display:grid;place-items:center;padding:6px 14px}
+.freccia svg{width:18px;height:32px;animation:respira 2.6s 3.8s ease-in-out infinite}
+.freccia path{stroke:rgba(239,229,210,.85);stroke-width:1.1;fill:none}
+@keyframes respira{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(6px);opacity:1}}
+#ingresso.salta *{animation-duration:1ms!important;animation-delay:0ms!important}
+
+/* ═══════ QUADRANTE ═══════ */
+#quadrante{position:relative;min-height:100svh;background:var(--carta);
+  display:grid;place-items:center;scroll-snap-align:start;overflow:hidden}
+.collage{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.collage img{position:absolute;filter:sepia(.9) contrast(.9) brightness(1.02);mix-blend-mode:multiply;
+  -webkit-mask-image:radial-gradient(60% 60% at 50% 50%,#000 30%,transparent 78%);
+  mask-image:radial-gradient(60% 60% at 50% 50%,#000 30%,transparent 78%)}
+.collage .a{left:-18%;top:-12%;width:68%;opacity:.3;transform:rotate(-2deg)}
+.collage .b{right:-20%;bottom:-18%;width:64%;opacity:.26;transform:rotate(1.5deg)}
+.collage::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(46% 44% at 50% 48%,rgba(239,229,210,.92) 18%,rgba(239,229,210,.3) 55%,transparent 80%)}
+
+.scena{position:relative;z-index:2;width:min(92vw,740px);aspect-ratio:1;
+  filter:drop-shadow(0 26px 44px rgba(54,40,34,.26));
+  transition:opacity .5s ease,transform .5s cubic-bezier(.4,0,.2,1)}
+.scena svg{width:100%;height:100%;overflow:visible}
+.anello{fill:none;stroke:var(--oro);vector-effect:non-scaling-stroke}
+.tacca{stroke:var(--oro);stroke-width:1;vector-effect:non-scaling-stroke;opacity:.5}
+.rim{transform-origin:400px 400px;animation:gira 260s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.settore{cursor:pointer;transform-origin:400px 400px;
+  transition:transform 440ms cubic-bezier(.22,.9,.26,1),filter 440ms ease,opacity 440ms ease}
+.settore .pala{fill:var(--camello);stroke:var(--oro);stroke-width:1;
+  vector-effect:non-scaling-stroke;transition:fill 300ms ease}
+.settore .eti{font-size:20px;letter-spacing:.17em;fill:var(--espresso);text-anchor:middle;
+  dominant-baseline:middle;pointer-events:none;text-transform:uppercase;
+  font-family:var(--tec);font-weight:500}
+@media (hover:hover) and (pointer:fine){
+  .scena:hover .settore{transform:translate(calc(var(--ux)*-7px),calc(var(--uy)*-7px));
+    filter:brightness(.95) saturate(.85);opacity:.7}
+  .settore:hover{transform:translate(calc(var(--ux)*16px),calc(var(--uy)*16px))!important;
+    filter:drop-shadow(0 10px 18px rgba(54,40,34,.3))!important;opacity:1!important;
+    transition:transform 165ms cubic-bezier(.2,1.5,.45,1),filter 150ms ease,opacity 150ms ease}
+  .settore:hover .pala{fill:#EFCB91}
+}
+.cuore image{opacity:0;transition:opacity .4s ease;filter:sepia(.5) contrast(1.06) saturate(.8)}
+.cuore image.on{opacity:1}
+.scrim{opacity:0;transition:opacity .4s ease}.scrim.on{opacity:1}
+.marchio{transition:opacity .35s ease}.marchio.via{opacity:0}
+.marchio .mt{font-size:36px;letter-spacing:.2em;fill:var(--espresso);text-anchor:middle;font-weight:300}
+.marchio .ms{font-size:11px;letter-spacing:.4em;fill:var(--oro);text-anchor:middle;
+  font-family:var(--tec);text-transform:uppercase}
+.nomeCuore{font-size:16px;letter-spacing:.28em;fill:var(--carta);text-anchor:middle;
+  font-family:var(--tec);text-transform:uppercase;opacity:0;transition:opacity .4s ease}
+.nomeCuore.on{opacity:1}
+
+/* ═══════ GUSCIO SEZIONE ═══════ */
+#sezione{position:fixed;inset:0;z-index:50;background:var(--carta);
+  display:flex;flex-direction:column;padding:3.4vh 4vw 3vh;overflow:hidden;
+  opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s}
+#sezione.aperta{opacity:1;visibility:visible}
+.rigaAlta{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem}
+.sTitolo{font-size:clamp(1.9rem,4vw,3.1rem);font-weight:300;letter-spacing:.1em;
+  color:var(--espresso);transform:translateY(14px);opacity:0;
+  transition:transform .55s cubic-bezier(.2,.8,.3,1) .08s,opacity .55s ease .08s}
+#sezione.aperta .sTitolo{transform:none;opacity:1}
+.utente{display:flex;gap:2.2rem;color:var(--espresso);opacity:0;padding-bottom:.55rem;
+  transition:opacity .5s ease .4s}
+#sezione.aperta .utente{opacity:.7}
+.utente span{cursor:pointer}.utente span:hover{color:var(--bordeaux)}
+.riga{height:1px;background:var(--oro);margin-top:.9rem;transform:scaleX(0);
+  transform-origin:left;transition:transform .75s cubic-bezier(.4,0,.2,1) .2s}
+#sezione.aperta .riga{transform:none}
+.indietro{align-self:flex-start;margin-top:.85rem;background:none;border:0;cursor:pointer;
+  color:var(--espresso);opacity:0;transition:opacity .5s ease .45s}
+#sezione.aperta .indietro{opacity:.65}
+.indietro:hover{opacity:1;color:var(--bordeaux)}
+.occhiello{margin-top:1.4rem;color:var(--espresso);opacity:0;max-width:82ch;
+  font-size:1.02rem;transition:opacity .5s ease .5s}
+#sezione.aperta .occhiello{opacity:.72}
+#contenuto{flex:1;min-height:0;margin-top:1vh;opacity:0;
+  transition:opacity .6s ease .55s}
+#sezione.aperta #contenuto{opacity:1}
+
+/* ── personaggi ── */
+.galleria{display:flex;gap:1.9rem;justify-content:center;align-items:center;height:100%;
+  padding-bottom:2vh}
+.ritratto{width:min(15vw,180px);cursor:pointer;
+  transition:transform 420ms cubic-bezier(.22,.9,.26,1),filter 380ms ease,opacity 380ms ease}
+.ritratto .arco{aspect-ratio:3/4;border:1px solid var(--oro);padding:6px;
+  background:rgba(214,167,95,.12);border-radius:50% 50% 3px 3px/34% 34% 2px 2px;overflow:hidden}
+.ritratto img{width:100%;height:100%;object-fit:cover;display:block;
+  border-radius:50% 50% 2px 2px/34% 34% 1px 1px;filter:sepia(.5) contrast(1.05) saturate(.82)}
+.ritratto figcaption{text-align:center;margin-top:.85rem;font-size:1.05rem;color:var(--espresso)}
+.ritratto figcaption small{display:block;margin-top:.3rem;color:var(--oro);
+  font-family:var(--tec);text-transform:uppercase;letter-spacing:.26em;font-size:.56rem}
+.galleria .ritratto:hover{transform:translateY(-14px);
+  filter:drop-shadow(0 16px 24px rgba(54,40,34,.3));
+  transition:transform 180ms cubic-bezier(.2,1.4,.45,1),filter 160ms ease,opacity 160ms ease}
+
+/* ── bestiario ── */
+.elenco{display:flex;flex-direction:column;justify-content:center;gap:1.4rem;height:100%;
+  max-width:1020px;margin:0 auto;overflow-y:auto}
+.voce{display:flex;align-items:stretch;gap:9px;cursor:pointer;
+  transition:transform 440ms cubic-bezier(.22,.9,.26,1),filter 400ms ease,opacity 360ms ease}
+.graffa{width:17px;flex:none}
+.graffa path{fill:none;stroke:var(--espresso);stroke-width:1;vector-effect:non-scaling-stroke;opacity:.65}
+.vcorpo{flex:1;display:flex;gap:1.5rem;align-items:center;padding:.7rem .2rem}
+.voce.dx .vcorpo{flex-direction:row-reverse}
+.vcorpo img{width:min(19vw,190px);aspect-ratio:4/3;object-fit:cover;
+  filter:sepia(.45) contrast(1.08) saturate(.85)}
+.vtesto{flex:1;min-width:0}
+.vtesto h3{font-size:1.5rem;font-weight:400;letter-spacing:.04em;margin-bottom:.4rem}
+.vtesto p{font-size:.98rem;line-height:1.6;opacity:.78;max-width:56ch;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.elenco:hover .voce{filter:blur(2.5px) saturate(.7);opacity:.42}
+.elenco .voce:hover{filter:none;opacity:1;transform:translateY(-10px) scale(1.012);
+  transition:transform 180ms cubic-bezier(.2,1.4,.45,1),filter 160ms ease,opacity 160ms ease}
+
+/* ── mappe ── */
+.mappeScena{height:100%;display:grid;place-items:center;position:relative}
+.raggi{position:absolute;width:min(78vh,760px);aspect-ratio:1;opacity:.3;pointer-events:none}
+.raggi line{stroke:var(--oro);stroke-width:1;vector-effect:non-scaling-stroke}
+.telaio{position:relative;width:min(58vw,620px);aspect-ratio:4/3;
+  border:1px solid var(--oro);padding:8px;background:rgba(214,167,95,.1);overflow:hidden}
+.telaio img{width:100%;height:100%;object-fit:cover;display:block;
+  filter:sepia(.5) contrast(1.05) saturate(.8);transition:opacity .4s ease,transform .6s ease}
+.telaio.cambio img{opacity:0;transform:scale(1.04)}
+.telaio::after{content:"";position:absolute;inset:8px;pointer-events:none;
+  background:radial-gradient(42% 38% at 50% 50%,rgba(20,14,10,.5),transparent 70%)}
+.cerchio{position:absolute;inset:0;margin:auto;width:46%;aspect-ratio:1;z-index:2;
+  border:1px solid rgba(239,229,210,.8);border-radius:50%;pointer-events:none;
+  box-shadow:0 0 0 1px rgba(54,40,34,.18) inset}
+.mappaNome{position:absolute;z-index:3;left:0;right:0;top:50%;transform:translateY(-50%);
+  text-align:center;font-size:clamp(1.5rem,3.1vw,2.5rem);letter-spacing:.2em;
+  color:var(--carta);text-shadow:0 2px 20px rgba(0,0,0,.75);pointer-events:none;
+  transition:opacity .35s ease}
+.mappeScena.cambio .mappaNome{opacity:0}
+.suggerimento{position:absolute;bottom:1.5vh;left:0;right:0;text-align:center;
+  color:var(--oro);opacity:.6}
+
+/* ── avventure ── */
+.biblio{height:100%;display:flex;gap:3vw;align-items:stretch}
+.scaffale{display:flex;gap:7px;align-items:stretch;padding:1.4rem 1rem;
+  background:linear-gradient(180deg,rgba(54,40,34,.07),rgba(54,40,34,.13));
+  border-top:1px solid var(--oro);border-bottom:1px solid var(--oro)}
+.dorso{width:clamp(34px,3.6vw,52px);border:0;cursor:pointer;position:relative;
+  background:linear-gradient(100deg,var(--d1),var(--d2));
+  box-shadow:inset -3px 0 6px rgba(0,0,0,.3),inset 2px 0 0 rgba(239,229,210,.14);
+  transition:transform 190ms cubic-bezier(.2,1.4,.45,1),box-shadow 190ms ease}
+.dorso span{writing-mode:vertical-rl;transform:rotate(180deg);display:block;
+  height:100%;padding:1.1rem .2rem;color:var(--carta);font-size:.92rem;
+  letter-spacing:.14em;text-shadow:0 1px 3px rgba(0,0,0,.5);white-space:nowrap;overflow:hidden}
+.dorso::after{content:"";position:absolute;left:5px;right:5px;top:9px;bottom:9px;
+  border:1px solid rgba(194,141,57,.5);pointer-events:none}
+.dorso:hover{transform:translateY(-16px)}
+.dorso.attivo{transform:translateY(-22px);box-shadow:inset -3px 0 6px rgba(0,0,0,.3),
+  inset 2px 0 0 rgba(239,229,210,.3),0 14px 20px rgba(54,40,34,.3)}
+.manifesto{flex:1;display:flex;gap:2rem;align-items:center;min-width:0}
+.manifesto img{height:min(62vh,460px);aspect-ratio:2/3;object-fit:cover;
+  border:1px solid var(--oro);padding:6px;background:rgba(214,167,95,.1);
+  filter:grayscale(.75) contrast(1.15);transition:opacity .4s ease}
+.manifesto.cambio img{opacity:0}
+.mInfo{min-width:0;transition:opacity .4s ease}
+.manifesto.cambio .mInfo{opacity:0}
+.mInfo h3{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:400;letter-spacing:.06em}
+.mInfo .et{color:var(--oro);margin:.7rem 0 1.1rem}
+.mInfo p{font-size:1rem;line-height:1.7;opacity:.75;max-width:40ch}
+
+/* ── negozio ── */
+.vetrinaG{height:100%;display:flex;gap:clamp(1.4rem,3vw,3.4rem);
+  justify-content:center;align-items:center}
+.arcoG{width:min(22vw,250px);position:relative;cursor:pointer;
+  transition:transform 440ms cubic-bezier(.22,.9,.26,1),filter 380ms ease,opacity 380ms ease}
+.arcoG.su{transform:translateY(-8%)} .arcoG.giu{transform:translateY(8%)}
+.aCornice{position:relative}
+.aFoto{aspect-ratio:2/3;overflow:hidden;background:var(--espresso);
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 160' preserveAspectRatio='none'%3E%3Cpath d='M0 160 L0 58 Q0 18 50 0 Q100 18 100 58 L100 160Z' fill='%23fff'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 160' preserveAspectRatio='none'%3E%3Cpath d='M0 160 L0 58 Q0 18 50 0 Q100 18 100 58 L100 160Z' fill='%23fff'/%3E%3C/svg%3E");
+  -webkit-mask-size:100% 100%;mask-size:100% 100%}
+.aFoto img{width:100%;height:100%;object-fit:cover;display:block;
+  filter:sepia(.5) contrast(1.22) brightness(.94) saturate(.8)}
+.aBordo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.aBordo path{fill:none;stroke:var(--oro);vector-effect:non-scaling-stroke}
+.aBordo .fuori{stroke-width:1.2} .aBordo .dentro{stroke-width:.7;opacity:.6}
+.aTarga{text-align:center;margin-top:1rem}
+.aTarga h3{font-size:1.3rem;font-weight:400;letter-spacing:.05em}
+.aTarga .pz{color:var(--bordeaux);margin-top:.35rem;font-family:var(--tec);
+  letter-spacing:.2em;font-size:.68rem}
+.vetrinaG .arcoG:hover{filter:drop-shadow(0 18px 26px rgba(54,40,34,.3));
+  transform:translateY(calc(var(--off,0%) - 16px)) scale(1.02);
+  transition:transform 190ms cubic-bezier(.2,1.4,.45,1),filter 160ms ease,opacity 160ms ease}
+.arcoG.su{--off:-8%} .arcoG.giu{--off:8%}
+
+/* ── musica ── */
+.tracce{height:100%;display:flex;flex-direction:column;justify-content:center;
+  gap:.2rem;max-width:820px;margin:0 auto;width:100%}
+.traccia{display:flex;align-items:center;gap:1.6rem;padding:1.1rem .6rem;
+  border-bottom:1px solid rgba(194,141,57,.3);cursor:pointer;
+  transition:background 240ms ease,padding-left 240ms ease}
+.traccia:hover{background:rgba(214,167,95,.16);padding-left:1.5rem}
+.traccia .num{color:var(--oro);font-family:var(--tec);font-size:.64rem;letter-spacing:.2em}
+.traccia .nm{flex:1;font-size:1.25rem}
+.onda{width:38%;height:22px;flex:none}
+.onda line{stroke:var(--oro);stroke-width:1.6;opacity:.45;transition:opacity .25s ease}
+.traccia:hover .onda line{opacity:.9}
+.traccia .dur{color:var(--espresso);opacity:.5;font-family:var(--tec);font-size:.62rem;letter-spacing:.14em}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="grana"></div>
+
+<section id="ingresso">
+  <svg class="palco" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <defs>
+      <mask id="archi"><g id="pieni" fill="#fff"></g></mask>
+      <linearGradient id="caldo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2a1d10" stop-opacity=".42"/>
+        <stop offset="1" stop-color="#0D0D0D" stop-opacity=".18"/></linearGradient>
+    </defs>
+    <g mask="url(#archi)">
+      <image href="img/mondo.jpg" x="0" y="-40" width="1200" height="790" preserveAspectRatio="xMidYMid slice"/>
+      <rect width="1200" height="700" fill="url(#caldo)"/>
+    </g>
+    <g id="cartoni"></g><g id="linee"></g>
+  </svg>
+  <div class="bordo"></div>
+  <svg class="emblema" viewBox="0 0 40 40" aria-hidden="true">
+    <circle cx="20" cy="20" r="9"/><path d="M20 2 L20 38 M2 20 L38 20"/>
+    <path d="M20 9 L26 20 L20 31 L14 20 Z"/>
+  </svg>
+  <div class="insegna">
+    <h1 class="titolo">Il Quadrante</h1>
+    <p class="sotto tec">nome provvisorio</p>
+  </div>
+  <div class="angolo dx tec">archivio vivo<br>mmxxvi</div>
+  <div class="piede">
+    <span class="trat"></span>
+    <button class="freccia" id="giu" aria-label="Scendi">
+      <svg viewBox="0 0 18 32"><path d="M9 1 V29 M3 23 L9 31 L15 23"/></svg>
+    </button>
+    <span class="trat"></span>
+  </div>
+</section>
+
+<section id="quadrante">
+  <div class="collage"><img class="a" src="img/mondo.jpg" alt=""><img class="b" src="img/m1.jpg" alt=""></div>
+  <div class="scena">
+    <svg viewBox="0 0 800 800">
+      <g class="rim"><g id="tacche"></g></g>
+      <circle class="anello" cx="400" cy="400" r="318" stroke-width="1" opacity=".5"/>
+      <circle class="anello" cx="400" cy="400" r="306" stroke-width="1" opacity=".85"/>
+      <g id="settori"></g>
+      <g class="cuore">
+        <clipPath id="tondo"><circle cx="400" cy="400" r="150"/></clipPath>
+        <linearGradient id="scuro" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#140E0A" stop-opacity="0"/>
+          <stop offset="1" stop-color="#140E0A" stop-opacity=".9"/></linearGradient>
+        <circle cx="400" cy="400" r="150" fill="#2b2119"/>
+        <g clip-path="url(#tondo)" id="immagini"></g>
+        <g clip-path="url(#tondo)"><rect class="scrim" id="scrim" x="250" y="420" width="300" height="130" fill="url(#scuro)"/></g>
+        <circle class="anello" cx="400" cy="400" r="150" stroke-width="1.4"/>
+        <circle class="anello" cx="400" cy="400" r="158" stroke-width="1" opacity=".45"/>
+        <g class="marchio" id="marchio">
+          <text class="mt" x="400" y="394">Quadrante</text>
+          <text class="ms" x="400" y="428">scegli una direzione</text></g>
+        <text class="nomeCuore" id="nomeCuore" x="400" y="512"></text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<div id="sezione">
+  <div class="rigaAlta">
+    <h2 class="sTitolo" id="sezTitolo"></h2>
+    <nav class="utente tec"><span>Home</span><span>Impostazioni</span><span>Profilo</span></nav>
+  </div>
+  <div class="riga"></div>
+  <button class="indietro tec" id="indietro">&larr;&nbsp;&nbsp;Torna al quadrante</button>
+  <p class="occhiello" id="sezOcchiello"></p>
+  <div id="contenuto"></div>
+</div>
+
+<script>
+const SEZ=[
+ {k:"personaggi",n:"Personaggi",i:"img/p1.jpg",o:"La galleria dei ritratti. Ogni cornice è la pagina di qualcuno, impaginata da lui."},
+ {k:"bestiario", n:"Bestiario", i:"img/b-kipine.jpg",o:"Le creature, una sotto l'altra, ciascuna racchiusa fra due graffe."},
+ {k:"mappe",     n:"Mappe",     i:"img/m1.jpg",o:"Gira la rotella sopra la carta per passare da una terra all'altra."},
+ {k:"avventure", n:"Avventure", i:"img/a1.jpg",o:"Gli scaffali. Tira fuori un volume e ti mostra il suo manifesto."},
+ {k:"musica",    n:"Musica",    i:"img/s-musica.jpg",o:"I temi delle terre. Questa sezione è ancora da pensare."},
+ {k:"negozio",   n:"Negozio",   i:"img/n1.jpg",o:"Le vetrine. Quello che qualcuno ha costruito e mette in vendita."}];
+
+/* ── ingresso ── */
+const A=[[361,511,170],[525,675,138],[689,839,170]],BA=662;
+A.forEach(([x1,x2,sp],k)=>{
+  const r=(x2-x1)/2, c=`M${x1} ${BA} L${x1} ${sp} A${r} ${r} 0 0 1 ${x2} ${sp} L${x2} ${BA}Z`;
+  pieni.insertAdjacentHTML('beforeend',`<path d="${c}"/>`);
+  cartoni.insertAdjacentHTML('beforeend',`<path class="cartone c${k+1}" d="${c}"/>`);
+  linee.insertAdjacentHTML('beforeend',`<path class="linea l${k+1}" d="M${x1} ${BA} L${x1} ${sp} A${r} ${r} 0 0 1 ${x2} ${sp} L${x2} ${BA}"/>`);
+});
+ingresso.addEventListener('click',e=>{if(!e.target.closest('#giu'))ingresso.classList.add('salta')});
+giu.addEventListener('click',()=>quadrante.scrollIntoView());
+
+/* ── quadrante ── */
+const C=400,RO=300,RI=170,G=1.5,rad=d=>d*Math.PI/180;
+const pt=(d,r)=>[C+r*Math.cos(rad(d)),C+r*Math.sin(rad(d))];
+for(let d=0;d<360;d+=5){const[a,b]=pt(d,306),[c,e]=pt(d,d%30?312:320);
+  tacche.insertAdjacentHTML('beforeend',`<line class="tacca" x1="${a}" y1="${b}" x2="${c}" y2="${e}"/>`)}
+SEZ.forEach((s,i)=>{
+  const a1=-120+i*60+G,a2=-60+i*60-G,m=-90+i*60;
+  const[ax,ay]=pt(a1,RI),[bx,by]=pt(a1,RO),[cx,cy]=pt(a2,RO),[dx,dy]=pt(a2,RI),[lx,ly]=pt(m,(RI+RO)/2);
+  settori.insertAdjacentHTML('beforeend',
+   `<g class="settore" data-i="${i}" tabindex="0" role="button" aria-label="${s.n}"
+       style="--ux:${Math.cos(rad(m)).toFixed(3)};--uy:${Math.sin(rad(m)).toFixed(3)}">
+      <path class="pala" d="M${ax} ${ay} L${bx} ${by} A${RO} ${RO} 0 0 1 ${cx} ${cy} L${dx} ${dy} A${RI} ${RI} 0 0 0 ${ax} ${ay}Z"/>
+      <text class="eti" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}">${s.n}</text></g>`);
+  immagini.insertAdjacentHTML('beforeend',
+   `<image href="${s.i}" x="250" y="250" width="300" height="300" preserveAspectRatio="xMidYMid slice"/>`)});
+const imgs=[...immagini.children];
+function mostra(i){
+  imgs.forEach((im,k)=>im.classList.toggle('on',k===i));
+  marchio.classList.toggle('via',i!==null);
+  nomeCuore.textContent=i===null?"":SEZ[i].n;
+  nomeCuore.classList.toggle('on',i!==null);
+  scrim.classList.toggle('on',i!==null)}
+settori.querySelectorAll('.settore').forEach(g=>{const i=+g.dataset.i;
+  g.addEventListener('mouseenter',()=>mostra(i));
+  g.addEventListener('focus',()=>mostra(i));
+  g.addEventListener('click',()=>apri(i));
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();apri(i)}})});
+document.querySelector('.scena').addEventListener('mouseleave',()=>mostra(null));
+
+/* ── contenuti ── */
+const PERS=[["Isaure","cartomante"],["Vedran","mercante d'ombre"],["Alcyne","erede"],
+            ["Tobia","cantore"],["Mirelle","custode"],["Orso","disertore"]];
+const BEST=[["Kipinè","b-kipine","Vive sulle creste dove il vento non smette mai. Caccia all'alba, quando la nebbia sta ancora bassa sui pini, e non lascia tracce che un cane sappia seguire. I pastori la chiamano con un altro nome per non attirarla."],
+            ["Flurry","b-flurry","Si muove in branco solo d'inverno. Il resto dell'anno nessuno ne vede due insieme, e chi ne incontra uno da solo di solito non torna per raccontarlo."],
+            ["Vrykolakas","b-vrykolakas","Non è nato così. Qualcuno l'ha sepolto male, o l'ha sepolto arrabbiato, e la terra non se l'è tenuto."]];
+const MAPPE=[["Vallenera","m1"],["Il Dorso del Mondo","m2"],["Acque di Mairen","m3"],["Soglia Bassa","m4"]];
+const AVV=[["Il Carnevale Lungo","a1","tre serate · 4-6 giocatori","Una città che non smette di festeggiare da undici anni, e nessuno ricorda più chi abbia dato il via."],
+           ["La Mano del Re","a2","una serata · 3-5 giocatori","Un banchetto, un ospite di troppo e una porta che non va aperta prima dell'alba."],
+           ["Rupe Candida","a3","campagna · 4-6 giocatori","La città sopra la rupe paga il suo acquedotto con qualcosa che non è denaro."],
+           ["Il Lago che Respira","a4","due serate · 2-4 giocatori","L'acqua si alza e si abbassa due volte al giorno, e il lago non ha sbocco sul mare."],
+           ["Ultima Discesa","a5","una serata · 4 giocatori","Si scende in miniera per riportare su un uomo. Si risale in cinque."]];
+const NEG=[["Carte dei Presagi","n1","24 carte · 9 €","su"],
+           ["Atlante di Vallenera","n2","48 pagine · 14 €","giu"],
+           ["Bestiario del Nord","n3","32 pagine · 12 €","su"]];
+const MUS=[["Vallenera","3:12"],["Marcia Bassa","2:48"],["Acque di Mairen","4:05"],
+           ["Il Carnevale Lungo","3:36"],["Ultima Discesa","5:21"]];
+
+const GSX='M24 1 C14 1 15 5 15 11 L15 43 C15 48 12 50 2 50 C12 50 15 52 15 57 L15 89 C15 95 14 99 24 99';
+const GDX='M2 1 C12 1 11 5 11 11 L11 43 C11 48 14 50 24 50 C14 50 11 52 11 57 L11 89 C11 95 12 99 2 99';
+const gr=d=>`<svg class="graffa" viewBox="0 0 26 100" preserveAspectRatio="none" aria-hidden="true"><path d="${d}"/></svg>`;
+const ARCO='M0 160 L0 58 Q0 18 50 0 Q100 18 100 58 L100 160';
+
+const CORPO={
+ personaggi:()=>`<div class="galleria">${PERS.map(([n,r],i)=>
+   `<figure class="ritratto"><div class="arco"><img src="img/p${i+1}.jpg" alt=""></div>
+      <figcaption>${n}<small>${r}</small></figcaption></figure>`).join('')}</div>`,
+ bestiario:()=>`<div class="elenco">${BEST.map(([n,f,t],i)=>
+   `<article class="voce ${i%2?'dx':''}">${gr(GSX)}
+      <div class="vcorpo"><img src="img/${f}.jpg" alt="">
+        <div class="vtesto"><h3>${n}</h3><p>${t}</p></div></div>${gr(GDX)}</article>`).join('')}</div>`,
+ mappe:()=>`<div class="mappeScena" id="mappeScena">
+     <svg class="raggi" viewBox="0 0 400 400" aria-hidden="true">${
+       Array.from({length:72},(_,i)=>{const a=i*5*Math.PI/180,r1=i%6?138:128,r2=i%6?196:200;
+       return `<line x1="${200+r1*Math.cos(a)}" y1="${200+r1*Math.sin(a)}" x2="${200+r2*Math.cos(a)}" y2="${200+r2*Math.sin(a)}"/>`}).join('')}</svg>
+     <div class="telaio" id="telaio"><img id="mappaImg" src="img/m1.jpg" alt=""><div class="cerchio"></div></div>
+     <p class="mappaNome" id="mappaNome">Vallenera</p>
+     <p class="suggerimento tec">rotella per cambiare terra</p></div>`,
+ avventure:()=>`<div class="biblio">
+     <div class="scaffale" id="scaffale">${AVV.map(([t],i)=>{
+       const c=[["#4a2f24","#2e1c14"],["#5a1a1c","#330e10"],["#2c3a2a","#18231a"],
+                ["#473a22","#271f10"],["#3a2b3a","#211823"]][i];
+       return `<button class="dorso" data-i="${i}" style="--d1:${c[0]};--d2:${c[1]}"><span>${t}</span></button>`}).join('')}</div>
+     <div class="manifesto" id="manifesto"><img id="posterImg" src="img/a1.jpg" alt="">
+       <div class="mInfo"><h3 id="pTit">${AVV[0][0]}</h3>
+         <p class="et tec" id="pEt">${AVV[0][2]}</p><p id="pTx">${AVV[0][3]}</p></div></div></div>`,
+ negozio:()=>`<div class="vetrinaG">${NEG.map(([n,f,p,q])=>
+   `<article class="arcoG ${q}"><div class="aCornice"><div class="aFoto"><img src="img/${f}.jpg" alt=""></div>
+      <svg class="aBordo" viewBox="0 0 100 160" preserveAspectRatio="none" aria-hidden="true">
+        <path class="fuori" d="${ARCO}"/><path class="dentro" d="M4 160 L4 59 Q4 21 50 4 Q96 21 96 59 L96 160"/></svg></div>
+      <div class="aTarga"><h3>${n}</h3><p class="pz">${p}</p></div></article>`).join('')}</div>`,
+ musica:()=>`<div class="tracce">${MUS.map(([n,d],i)=>
+   `<div class="traccia"><span class="num">${String(i+1).padStart(2,'0')}</span>
+      <span class="nm">${n}</span>
+      <svg class="onda" viewBox="0 0 200 22" preserveAspectRatio="none">${
+        Array.from({length:60},(_,j)=>{const h=3+Math.abs(Math.sin(j*(i+1.7))*9);
+        return `<line x1="${j*3.3+1}" y1="${11-h}" x2="${j*3.3+1}" y2="${11+h}"/>`}).join('')}</svg>
+      <span class="dur">${d}</span></div>`).join('')}</div>`};
+
+const DOPO={
+ mappe(){let i=0,blocco=false;const sc=mappeScena;
+   sc.addEventListener('wheel',e=>{e.preventDefault();if(blocco)return;blocco=true;
+     i=(i+(e.deltaY>0?1:MAPPE.length-1))%MAPPE.length;
+     telaio.classList.add('cambio');sc.classList.add('cambio');
+     setTimeout(()=>{mappaImg.src=`img/${MAPPE[i][1]}.jpg`;mappaNome.textContent=MAPPE[i][0];
+       telaio.classList.remove('cambio');sc.classList.remove('cambio')},380);
+     setTimeout(()=>blocco=false,620)},{passive:false})},
+ avventure(){const d=scaffale.children;d[0].classList.add('attivo');
+   [...d].forEach(b=>b.addEventListener('click',()=>{
+     const i=+b.dataset.i;[...d].forEach(x=>x.classList.remove('attivo'));b.classList.add('attivo');
+     manifesto.classList.add('cambio');
+     setTimeout(()=>{posterImg.src=`img/${AVV[i][1]}.jpg`;pTit.textContent=AVV[i][0];
+       pEt.textContent=AVV[i][2];pTx.textContent=AVV[i][3];
+       manifesto.classList.remove('cambio')},340)}))}};
+
+function apri(i){const s=SEZ[i];
+  document.querySelector('.scena').style.cssText='opacity:0;transform:scale(.95)';
+  sezTitolo.textContent=s.n; sezOcchiello.textContent=s.o;
+  contenuto.innerHTML=CORPO[s.k]();
+  setTimeout(()=>{sezione.classList.add('aperta');DOPO[s.k]&&DOPO[s.k]()},220)}
+indietro.addEventListener('click',()=>{
+  sezione.classList.remove('aperta');
+  setTimeout(()=>{document.querySelector('.scena').style.cssText='';contenuto.innerHTML=''},460)});
+</script>
+</body>
+</html>
