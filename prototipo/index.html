@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Il Quadrante — prototipo</title>
+<style>
+:root {
+  --notte: #0e0c0a;
+  --carta: #e6dbc3;
+  --carta-chiara: #efe6d2;
+  --carta-scura: #d4c5a6;
+  --inchiostro: #1d1812;
+  --inchiostro-tenue: #5a4e40;
+  --accento: #b0501f;
+  --oro: #a9894f;
+  --serif: Georgia, "Times New Roman", Times, serif;
+  --rapido: cubic-bezier(.2, .8, .2, 1);
+  --grana: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .22 0 0 0 0 .12 0 0 0 .45 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--serif);
+  color: var(--inchiostro);
+  background: var(--notte);
+}
+body[data-fondo="notte"] {
+  color: var(--carta);
+  background: radial-gradient(ellipse at 50% 45%, #241d16 0%, var(--notte) 70%) fixed;
+}
+body[data-fondo="carta"] {
+  background-color: var(--carta);
+  background-image: var(--grana), radial-gradient(ellipse at 50% 30%, transparent 45%, rgba(90, 60, 30, .2) 100%);
+  background-attachment: scroll, fixed;
+}
+body[data-fondo="bianco"] { color: #111; background: #f6f4ef; }
+body[data-fondo="stelle"] {
+  color: var(--carta);
+  background-color: #07080d;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 120px 150px, #cfd3e0 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 200px 70px, #fffbe8 50%, transparent 51%),
+    radial-gradient(1px 1px at 300px 260px, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 77px 341px, #e8e2cc 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 401px 113px, #fff 50%, transparent 51%),
+    radial-gradient(ellipse at 50% 20%, #1b2442 0%, transparent 65%);
+  background-size: 260px 260px, 190px 190px, 330px 330px, 410px 410px, 373px 373px, 517px 517px, 100% 100%;
+  background-attachment: fixed;
+}
+
+h1, h2, h3 { font-weight: normal; font-variant: small-caps; letter-spacing: .06em; }
+
+.tasto {
+  font: inherit;
+  font-variant: small-caps;
+  letter-spacing: .08em;
+  color: inherit;
+  background: none;
+  border: 1px solid var(--oro);
+  padding: .4em 1em;
+  cursor: pointer;
+  transition: transform .12s var(--rapido);
+}
+.tasto:active { transform: scale(.96); }
+:focus-visible { outline: 2px solid var(--accento); outline-offset: 3px; }
+
+.schermo { overflow-x: clip; animation: entra .22s var(--rapido) backwards; }
+@keyframes entra { from { opacity: 0; transform: translateY(8px); } }
+
+/* ---------- Ingresso ---------- */
+.ingresso {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: var(--notte);
+  cursor: pointer;
+  animation: svanisce .6s ease-in 1.35s forwards;
+}
+@keyframes svanisce { to { opacity: 0; } }
+.arcate {
+  display: flex;
+  gap: min(3vw, 26px);
+  animation: dentro .65s cubic-bezier(.55, 0, .85, .35) 1.3s forwards;
+}
+@keyframes dentro { to { transform: scale(2.6); } }
+.arcata {
+  --i: 0;
+  position: relative;
+  width: min(25vw, 180px);
+  aspect-ratio: 5 / 8;
+  overflow: hidden;
+  border: 1px solid var(--oro);
+  border-radius: 50% 50% 0 0 / 31.25% 31.25% 0 0;
+  perspective: 600px;
+  opacity: 0;
+  animation: appare .3s ease-out forwards;
+  animation-delay: calc(var(--i) * .1s);
+}
+@keyframes appare { to { opacity: 1; } }
+.arcata > svg {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: calc(300% + 2 * min(3vw, 26px));
+  left: calc(var(--i) * (-100% - min(3vw, 26px)));
+}
+.anta {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background: linear-gradient(90deg, #17120e, #0f0c09);
+  animation: apri .5s var(--rapido) forwards;
+  animation-delay: calc(.3s + var(--i) * .18s);
+}
+.anta.s { left: 0; transform-origin: left; border-right: 1px solid rgba(169, 137, 79, .6); }
+.anta.d { right: 0; transform-origin: right; --verso: -1; }
+@keyframes apri { to { transform: rotateY(calc(var(--verso, 1) * 92deg)); opacity: 0; } }
+.ingresso-nome {
+  margin: 0;
+  font-variant: small-caps;
+  letter-spacing: .3em;
+  color: var(--oro);
+  opacity: 0;
+  animation: appare .4s ease-out .5s forwards;
+}
+
+/* ---------- Quadrante ---------- */
+.quadrante {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 16px 32px;
+}
+.quadrante.da-ingresso { animation: sorge .55s var(--rapido) 1.4s backwards; }
+@keyframes sorge { from { opacity: 0; transform: scale(.88); } }
+.q-testa {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+}
+.marchio { font-variant: small-caps; letter-spacing: .16em; color: var(--oro); }
+.rivedi { font-size: .85rem; }
+.disco { --rot: 0; position: relative; width: min(88vw, 76vh, 560px); aspect-ratio: 1; }
+.anello {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(calc(var(--rot) * 1deg));
+  transition: transform .45s var(--rapido);
+}
+.fondo-anello { fill: #18130f; stroke: var(--oro); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.tacca { stroke: var(--oro); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: .7; }
+.settore { cursor: pointer; outline: none; transition: transform .18s var(--rapido), filter .18s; }
+.settore path { fill: url(#carta-anello); stroke: var(--oro); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.etichetta {
+  font-family: var(--serif);
+  font-size: 8.5px;
+  font-variant: small-caps;
+  letter-spacing: .6px;
+  fill: var(--inchiostro);
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(calc(var(--rot) * -1deg));
+  transition: transform .45s var(--rapido);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .settore:hover { transform: translate(var(--dx), var(--dy)); filter: brightness(1.06); transition-duration: .12s; }
+}
+.settore:focus-visible { transform: translate(var(--dx), var(--dy)); }
+.settore:focus-visible path { stroke: var(--accento); stroke-width: 2; }
+.settore.scelto { filter: brightness(1.08); }
+.settore.scelto .etichetta { fill: var(--accento); }
+.indice {
+  position: absolute;
+  top: -1%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 13px solid var(--accento);
+  transform: translateX(-50%);
+}
+.centro {
+  position: absolute;
+  inset: 26%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6%;
+  text-align: center;
+  color: var(--inchiostro);
+  border-radius: 50%;
+  background-color: var(--carta-scura);
+  background-image: var(--grana);
+  box-shadow: 0 0 0 1px var(--oro), inset 0 0 0 5px var(--carta-scura), inset 0 0 0 6px var(--oro);
+}
+.centro-nome { font-variant: small-caps; letter-spacing: .08em; font-size: clamp(1.05rem, 3.6vw, 1.6rem); }
+.centro-riga { font-style: italic; font-size: clamp(.72rem, 2.1vw, .92rem); line-height: 1.3; margin: .35em 0 .7em; }
+.centro-nome, .centro-riga { animation: entra .14s ease-out; }
+.entra {
+  font-size: clamp(.8rem, 2.2vw, .95rem);
+  border-color: var(--accento);
+  opacity: 0;
+  transform: scale(.9);
+  transition: opacity .16s, transform .16s var(--rapido);
+}
+.entra.attivo { opacity: 1; transform: none; }
+
+/* ---------- Guscio delle sezioni ---------- */
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--oro);
+  background-color: var(--carta);
+  background-image: var(--grana);
+}
+.barra > :first-child { justify-self: start; }
+.barra > :last-child { justify-self: end; }
+.barra .tasto { font-size: .9rem; padding: .3em .8em; white-space: nowrap; }
+.barra-titolo { font-variant: small-caps; letter-spacing: .14em; }
+body[data-fondo="bianco"] .barra { background: #f6f4ef; }
+body[data-fondo="stelle"] .barra { background: rgba(7, 8, 13, .88); }
+.pagina { max-width: 940px; margin: 0 auto; padding: 8px 16px 96px; }
+.titolo-sezione { text-align: center; font-size: clamp(1.8rem, 6vw, 2.8rem); letter-spacing: .1em; margin: 32px 0 4px; }
+.provvisorio { text-align: center; font-style: italic; font-size: .85rem; opacity: .7; margin: 0 0 40px; }
+
+/* ---------- Bestiario: graffe ---------- */
+.graffa { display: flex; flex-direction: column; width: 24px; color: var(--inchiostro-tenue); }
+.graffa svg { display: block; flex: none; width: 24px; height: 24px; overflow: visible; }
+.graffa path { fill: none; stroke: currentColor; stroke-width: 1; stroke-linecap: round; }
+.graffa .asta { flex: 1; min-height: 6px; margin-left: 11.5px; border-left: 1px solid currentColor; }
+.graffa.destra { transform: scaleX(-1); }
+
+/* ---------- Bestiario: elenco ---------- */
+.elenco { display: flex; flex-direction: column; gap: 44px; }
+.voce {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 24px;
+  gap: 14px;
+  padding: 18px 6px;
+  color: inherit;
+  text-decoration: none;
+  background-color: var(--carta);
+  background-image: var(--grana);
+  transition: transform .5s ease, box-shadow .5s ease, filter .5s ease, opacity .5s ease;
+}
+.corpo { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 24px; align-items: center; }
+.voce:nth-child(even) .corpo { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+.voce:nth-child(even) .illustrazione { order: 2; }
+.illustrazione { margin: 0; }
+.illustrazione img, .riquadro {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border: 1px solid var(--oro);
+  box-shadow: 0 0 0 4px var(--carta), 0 0 0 5px rgba(169, 137, 79, .6);
+}
+.riquadro { background: repeating-linear-gradient(45deg, var(--carta-scura) 0 6px, var(--carta) 6px 12px); }
+.testo h2 { font-size: 1.7rem; margin: 0 0 .1em; }
+.tipo { font-style: italic; color: var(--inchiostro-tenue); margin: 0 0 .8em; font-size: .92rem; }
+.breve {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0 0 .9em;
+  line-height: 1.55;
+}
+.leggi { font-variant: small-caps; letter-spacing: .1em; font-size: .9rem; color: var(--inchiostro-tenue); }
+@media (max-width: 480px) {
+  .corpo { grid-template-columns: 1fr; gap: 16px; }
+  .voce:nth-child(even) .corpo { grid-template-columns: 1fr; }
+  .voce:nth-child(even) .illustrazione { order: 0; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .elenco:not(.apertura) .voce:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 34px -14px rgba(40, 25, 10, .55);
+    transition-duration: .2s;
+  }
+  .elenco:not(.apertura):has(.voce:hover) .voce:not(:hover) {
+    filter: blur(3px) grayscale(1);
+    opacity: .55;
+    transition-duration: .2s;
+  }
+}
+.elenco.apertura .voce:not(.scelta) { opacity: 0; filter: blur(8px); transition-duration: .22s; }
+.elenco.apertura .voce.scelta { transform: scale(1.03); box-shadow: 0 24px 40px -16px rgba(40, 25, 10, .5); transition-duration: .22s; }
+
+/* ---------- Bestiario: scheda ---------- */
+.scheda-strato {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transform-origin: 0 0;
+  background-color: var(--carta);
+  background-image: var(--grana);
+}
+.scheda-int {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 24px;
+  gap: 12px;
+  min-height: calc(100% - 52px);
+  padding: 20px 8px 48px;
+}
+.scheda-contenuto { max-width: 1000px; width: 100%; margin: 0 auto; padding: 8px 0; }
+.scheda-testa { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 36px; align-items: start; }
+.scheda-testa h1 { font-size: clamp(2.2rem, 7vw, 3.8rem); margin: 0; line-height: 1; }
+.scheda-testa .tipo { font-size: 1.05rem; margin-top: .5em; }
+.pannello {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 18px;
+  margin: 24px 0 0;
+  padding: 16px 18px;
+  border: 1px solid var(--oro);
+  box-shadow: inset 0 0 0 3px var(--carta), inset 0 0 0 4px rgba(169, 137, 79, .45);
+}
+.pannello dt { font-variant: small-caps; letter-spacing: .08em; color: var(--inchiostro-tenue); }
+.pannello dd { margin: 0; }
+.lore-scheda {
+  columns: 2;
+  column-gap: 44px;
+  column-rule: 1px solid rgba(169, 137, 79, .5);
+  margin-top: 44px;
+  line-height: 1.68;
+  font-size: 1.05rem;
+  text-align: justify;
+  hyphens: auto;
+}
+.lore-scheda p { margin: 0 0 1em; }
+.lore-scheda p:first-child::first-letter {
+  float: left;
+  font-size: 4.2em;
+  line-height: .8;
+  padding: .06em .08em 0 0;
+  color: var(--accento);
+}
+@media (max-width: 700px) {
+  .lore-scheda { columns: 1; }
+  .scheda-testa { grid-template-columns: 1fr; gap: 24px; }
+}
+
+/* ---------- Personaggi ---------- */
+.galleria { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 56px 32px; }
+.personaggio { text-align: center; }
+.ritratto-cornice { position: relative; width: 72%; margin: 30px auto 26px; aspect-ratio: 3 / 4; }
+.raggi { position: absolute; left: -30%; top: 50%; width: 160%; aspect-ratio: 1; transform: translateY(-50%); overflow: visible; }
+.raggi line { stroke: var(--oro); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: .55; }
+.ritratto {
+  --tinta: #5b4a3a;
+  position: relative;
+  height: 100%;
+  border: 1px solid var(--oro);
+  border-radius: 50% 50% 0 0 / 37.5% 37.5% 0 0;
+  box-shadow: 0 0 0 5px var(--carta), 0 0 0 6px var(--oro);
+  background:
+    radial-gradient(circle at 50% 40%, var(--tinta) 0 16%, transparent 16.5%),
+    radial-gradient(ellipse 44% 34% at 50% 100%, var(--tinta) 0 97%, transparent 100%),
+    linear-gradient(#d8c7a3, #b49b72);
+}
+.personaggio h2 { margin: 0; font-size: 1.5rem; }
+.ruolo { font-style: italic; color: var(--inchiostro-tenue); margin: .2em 0 1.2em; }
+.personaggio details { text-align: left; border-top: 1px solid rgba(169, 137, 79, .6); }
+.personaggio details:last-child { border-bottom: 1px solid rgba(169, 137, 79, .6); }
+.personaggio summary {
+  display: flex;
+  justify-content: space-between;
+  padding: .55em .2em;
+  cursor: pointer;
+  list-style: none;
+  font-variant: small-caps;
+  letter-spacing: .08em;
+}
+.personaggio summary::-webkit-details-marker { display: none; }
+.personaggio summary::after { content: "+"; color: var(--oro); }
+.personaggio details[open] summary::after { content: "−"; }
+.personaggio details p { margin: 0 .2em .9em; line-height: 1.55; animation: entra .18s var(--rapido); }
+
+/* ---------- Lore ---------- */
+.lore-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 44px; align-items: start; }
+.indice-lore { position: sticky; top: 76px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding-left: 14px; border-left: 1px solid var(--oro); }
+.voce-indice { font: inherit; font-variant: small-caps; letter-spacing: .06em; color: var(--inchiostro-tenue); background: none; border: 0; padding: 2px 0; text-align: left; cursor: pointer; }
+.voce-indice.attiva { color: var(--accento); }
+.voce-lore { max-width: 66ch; margin-bottom: 64px; scroll-margin-top: 76px; }
+.voce-lore h2 { font-size: 2rem; margin: 0 0 .5em; }
+.voce-lore p { font-size: 1.08rem; line-height: 1.78; margin: 0 0 1.1em; }
+.rimando { font: inherit; font-variant: small-caps; color: var(--accento); background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+@media (max-width: 720px) {
+  .lore-layout { grid-template-columns: 1fr; gap: 28px; }
+  .indice-lore { position: static; flex-flow: row wrap; gap: 6px 18px; padding: 0 0 12px; border-left: 0; border-bottom: 1px solid var(--oro); }
+}
+
+/* ---------- Avventure ---------- */
+.avv { min-height: 62vh; display: flex; align-items: center; }
+.avv-contenuto { width: 100%; }
+.avv-num { font-size: clamp(3rem, 12vw, 7.5rem); line-height: 1; margin: 48px 0 0; }
+.avv-titolo { font-size: clamp(2.4rem, 9vw, 6rem); line-height: 1.02; margin: .15em 0 .45em; }
+.avv-gancio { font-size: clamp(1.15rem, 2.8vw, 1.55rem); font-style: italic; max-width: 32ch; margin: 0; line-height: 1.45; }
+.avv-meta { display: flex; flex-wrap: wrap; gap: 20px 48px; margin: 64px 0 0; padding-top: 16px; border-top: 1px solid #111; }
+.avv-meta dt { font-variant: small-caps; letter-spacing: .1em; font-size: .85rem; color: #555; }
+.avv-meta dd { margin: .2em 0 0; font-size: 1.15rem; }
+.avv-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 56px; }
+.avv-nav .tasto { border-color: #111; font-size: 1.3rem; padding: .2em .9em; }
+.avv-conta { letter-spacing: .2em; }
+
+/* ---------- Meccaniche ---------- */
+.favo { position: relative; width: min(100%, 620px); margin: 0 auto; aspect-ratio: 100 / 88; }
+.favo > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.favo line { stroke: var(--oro); stroke-width: 2; vector-effect: non-scaling-stroke; opacity: .5; transition: opacity .15s; }
+.favo line.accesa { stroke: var(--accento); opacity: 1; }
+.cella {
+  position: absolute;
+  width: 27%;
+  aspect-ratio: 1 / 1.1547;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  color: var(--inchiostro);
+  background: var(--oro);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  cursor: pointer;
+  transition: transform .15s var(--rapido), opacity .15s, filter .15s;
+}
+.cella-int {
+  position: absolute;
+  inset: 1.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14%;
+  clip-path: inherit;
+  font-variant: small-caps;
+  letter-spacing: .05em;
+  font-size: clamp(.66rem, 2.6vw, 1rem);
+  background-color: var(--carta-chiara);
+  background-image: var(--grana);
+}
+.cella-int::after { content: ""; position: absolute; inset: 0; background: var(--accento); mix-blend-mode: multiply; opacity: 0; transition: opacity .15s; }
+.cella:focus-visible { outline: none; }
+.cella.accesa { transform: scale(1.08); z-index: 2; filter: brightness(1.04); }
+.cella.accesa .cella-int::after { opacity: .3; }
+.cella.sbloccata .cella-int::after { opacity: .12; }
+.favo.attivo .cella:not(.accesa):not(.sbloccata) { opacity: .5; }
+.sblocchi { max-width: 620px; min-height: 7.5em; margin: 28px auto 0; padding: 14px 18px; border: 1px solid var(--oro); }
+.sblocchi h3 { margin: 0 0 .3em; font-size: 1.3rem; }
+.sblocchi p { margin: 0 0 .4em; }
+.sblocchi-riga { font-variant: small-caps; letter-spacing: .06em; color: var(--accento); }
+.sblocchi-vuoto { font-style: italic; opacity: .7; }
+
+/* ---------- Mappe ---------- */
+.mappe { position: relative; text-align: center; }
+.titolo-cerchio {
+  position: relative;
+  width: min(64vw, 260px);
+  aspect-ratio: 1;
+  margin: 40px auto 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid var(--oro);
+  border-radius: 50%;
+  outline: 1px solid rgba(169, 137, 79, .45);
+  outline-offset: 8px;
+  background: radial-gradient(circle, #10162a 0%, #07080d 75%);
+}
+.titolo-cerchio h1 { margin: 0; font-size: clamp(2rem, 8vw, 3rem); letter-spacing: .14em; }
+.titolo-cerchio p { margin: .3em 0 0; font-style: italic; opacity: .75; font-size: .9rem; }
+.raggi-mappa { position: absolute; left: 50%; top: 50%; width: 1600px; height: 1600px; transform: translate(-50%, -50%); z-index: -1; pointer-events: none; }
+.raggi-mappa line, .raggi-mappa circle { stroke: var(--oro); stroke-width: 1; fill: none; opacity: .28; }
+.vedute { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 40px 36px; }
+.veduta { margin: 0; width: min(80vw, 230px); }
+.veduta.tondo { width: min(80vw, 280px); }
+.finestra {
+  overflow: hidden;
+  border: 1px solid var(--oro);
+  outline: 1px solid rgba(169, 137, 79, .4);
+  outline-offset: 5px;
+  transition: transform .2s var(--rapido);
+}
+.tondo .finestra { aspect-ratio: 1; border-radius: 50%; }
+.mezzo .finestra { aspect-ratio: 2 / 1; border-radius: 999px 999px 0 0; }
+.finestra svg { display: block; width: 100%; height: 100%; }
+@media (hover: hover) { .veduta:hover .finestra { transform: scale(1.03); } }
+.veduta figcaption { margin-top: 16px; }
+.veduta b { display: block; font-weight: normal; font-variant: small-caps; letter-spacing: .1em; font-size: 1.15rem; }
+.veduta span { font-style: italic; opacity: .75; font-size: .9rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+<body data-fondo="notte">
+<div id="scena"></div>
+<script>
+'use strict';
+
+/* ================= Dati provvisori ================= */
+
+const SEZIONI = [
+  { id: 'personaggi', nome: 'Personaggi', riga: 'Chi abita il mondo, e chi lo cambia.', fondo: 'carta' },
+  { id: 'lore', nome: 'Lore', riga: 'Storie, età e culti, da leggere con calma.', fondo: 'carta' },
+  { id: 'avventure', nome: 'Avventure', riga: 'Le storie giocate e quelle da giocare.', fondo: 'bianco' },
+  { id: 'meccaniche', nome: 'Meccaniche', riga: 'Le regole, e cosa sblocca cosa.', fondo: 'carta' },
+  { id: 'bestiario', nome: 'Bestiario', riga: "Le creature, una dopo l'altra.", fondo: 'carta' },
+  { id: 'mappe', nome: 'Mappe', riga: 'I luoghi, visti da lontano.', fondo: 'stelle' },
+];
+
+const BREVE = "Testo provvisorio. Qui andrà la presentazione breve della creatura: dove la si incontra, come la si riconosce al primo sguardo e cosa fa quando capisce di essere osservata. Il testo prosegue apposta oltre le cinque righe, perché serve a vedere dove l'elenco lo taglia e come cadono i puntini di sospensione. Nella versione vera ci sarà un testo scritto a mano; questo è solo riempitivo che misura lo spazio.";
+
+const loreDi = nome => [
+  `${nome}: primo paragrafo della lore, quello che porta il capolettera. Qui va l'apertura della scheda, la frase che mette chi legge davanti alla creatura prima di qualsiasi dato. Il testo è provvisorio e serve a riempire le colonne per giudicare la misura della riga e il ritmo della pagina.`,
+  "Secondo paragrafo. Abitudini, territorio, il modo in cui si muove e quello in cui si nasconde. Una pagina di lore regge bene paragrafi di cinque o sei righe: più lunghi diventano un muro, più corti sembrano un elenco travestito.",
+  "Terzo paragrafo. Le voci che circolano, quelle vere e quelle inventate da chi non l'ha mai vista. Di solito qui comincia la seconda colonna, ed è utile vedere se lo stacco cade in un punto che si legge bene.",
+  "Quarto paragrafo. Cosa sanno i sapienti, dove sbagliano, e cosa conviene fare in caso di incontro. Chiusura della scheda, ancora provvisoria.",
+];
+
+const BESTIE = [
+  { nome: 'Kipine', img: 'kipine.jpg', pericolo: '●●○○○' },
+  { nome: 'Flurry', img: 'flurry.jpg', pericolo: '●○○○○' },
+  { nome: 'Vrykolakas', img: 'vrykolakas.jpg', pericolo: '●●●●○' },
+];
+
+const PERSONAGGI = [
+  { nome: 'Personaggio I', ruolo: 'Ruolo provvisorio', tinta: '#5b4a3a' },
+  { nome: 'Personaggio II', ruolo: 'Ruolo provvisorio', tinta: '#3f4a52' },
+  { nome: 'Personaggio III', ruolo: 'Ruolo provvisorio', tinta: '#6a3d2c' },
+];
+const BLOCCHI_PERSONAGGIO = [
+  ['Aspetto', "Come appare, cosa porta addosso, cosa si nota per primo. Testo provvisorio."],
+  ['Storia', "Da dove viene e cosa le è successo prima di entrare in gioco. Testo provvisorio."],
+  ['Legami', "Chi conosce, chi le deve qualcosa, chi la cerca. Testo provvisorio."],
+  ['Note di gioco', "Come si usa al tavolo: tono, abitudini, frasi tipiche. Testo provvisorio."],
+];
+
+const RIEMPI_LORE = [
+  ["Secondo paragrafo, provvisorio. Una voce di lore si legge come un capitolo: righe piene, nessun riquadro, niente che distragga. La colonna è tenuta stretta di proposito, intorno ai sessantacinque caratteri, perché è la misura in cui l'occhio torna a capo senza perdersi."],
+  ["Terzo paragrafo, provvisorio. Qui andranno date, nomi e luoghi. Il testo vero sarà più denso di questo, ed è proprio per quello che conviene decidere adesso spaziatura e grandezza del carattere, quando ancora non costa niente cambiarle."],
+  ["Quarto paragrafo, provvisorio. Le voci lunghe possono scendere di molto; l'indice a lato resta fermo e segna dove ci si trova, così non serve tornare in cima per cambiare voce."],
+];
+const LORE = [
+  { id: 'origini', titolo: 'Le origini', testo: [
+    ["Testo provvisorio sulle origini del mondo. Quando una voce ne richiama un'altra, il rimando sta dentro la frase, come questo verso ", { ref: 'eta', t: 'le età del mondo' }, ", e porta direttamente alla voce senza cambiare pagina."],
+    ...RIEMPI_LORE,
+  ] },
+  { id: 'eta', titolo: 'Le età del mondo', testo: [
+    ["Testo provvisorio sulle età. Si torna indietro verso ", { ref: 'origini', t: 'le origini' }, ", oppure si va avanti verso ", { ref: 'culti', t: 'i culti' }, ", che nascono nell'ultima età."],
+    ...RIEMPI_LORE,
+  ] },
+  { id: 'culti', titolo: 'I culti', testo: [
+    ["Testo provvisorio sui culti. Le loro date stanno in ", { ref: 'eta', t: 'le età del mondo' }, "; qui vanno credenze, riti e chi li custodisce."],
+    ...RIEMPI_LORE,
+  ] },
+];
+
+const AVVENTURE = [
+  { num: 'I', titolo: 'La prima avventura', gancio: 'Una riga sola che dice di cosa parla, e basta.', meta: [['Giocatori', '3–5'], ['Sessioni', '2'], ['Stato', 'Giocata']] },
+  { num: 'II', titolo: 'La seconda avventura', gancio: 'Il gancio, provvisorio: chi chiama i personaggi e perché.', meta: [['Giocatori', '4'], ['Sessioni', '3'], ['Stato', 'In corso']] },
+  { num: 'III', titolo: 'La terza avventura', gancio: 'Ancora da scrivere. Qui resta molto spazio vuoto, apposta.', meta: [['Giocatori', '—'], ['Sessioni', '—'], ['Stato', 'In preparazione']] },
+];
+
+const CELLE = [
+  { id: 'base', nome: 'Tiro base', a: null, descr: 'Il tiro da cui parte tutto. Testo provvisorio.', sblocca: ['vantaggio', 'fatica', 'magia'] },
+  { id: 'vantaggio', nome: 'Vantaggio', a: 0, descr: 'Quando la situazione aiuta. Testo provvisorio.', sblocca: [] },
+  { id: 'fatica', nome: 'Fatica', a: 60, descr: 'Quanto si può spingere prima di cedere.', sblocca: ['ferite'] },
+  { id: 'ferite', nome: 'Ferite', a: 120, descr: 'Cosa resta addosso dopo uno scontro.', sblocca: ['riposo'] },
+  { id: 'riposo', nome: 'Riposo', a: 180, descr: 'Come si recupera, e quanto costa.', sblocca: [] },
+  { id: 'rituali', nome: 'Rituali', a: 240, descr: 'Magia lenta, con un prezzo.', sblocca: [] },
+  { id: 'magia', nome: 'Magia', a: 300, descr: 'Le regole di base degli incantesimi.', sblocca: ['rituali'] },
+];
+
+const PAL_INGRESSO = { cielo: ['#141a2c', '#3b2b3a', '#a5502a', '#e08a3c'], astro: '#f3c784', colli: ['#3a2a26', '#241a17', '#120d0b'], stelle: true };
+const VEDUTE = [
+  { nome: 'Veduta I', riga: 'Una regione da scrivere', forma: 'mezzo', seme: 3, pal: { cielo: ['#2c3a2e', '#6d7a52', '#d9b26a'], astro: '#f4dca0', colli: ['#4b5236', '#2f3524', '#191c13'] } },
+  { nome: 'Veduta II', riga: 'La regione centrale', forma: 'tondo', seme: 11, pal: { cielo: ['#0b1430', '#24365e', '#5e6f8f'], astro: '#e9e4d0', colli: ['#2a3550', '#1a2238', '#0d1220'], stelle: true } },
+  { nome: 'Veduta III', riga: 'Il confine, provvisorio', forma: 'mezzo', seme: 23, pal: { cielo: ['#2a1420', '#7a2f2a', '#d0682e'], astro: '#f6c27a', colli: ['#3b2220', '#25140f', '#120a08'] } },
+];
+
+/* ================= Attrezzi ================= */
+
+const NS = 'http://www.w3.org/2000/svg';
+const meno = matchMedia('(prefers-reduced-motion: reduce)');
+const dur = ms => (meno.matches ? 0 : ms);
+const RAPIDO = 'cubic-bezier(.2, .8, .2, 1)';
+
+function el(tag, cls, testo) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (testo != null) e.textContent = testo;
+  return e;
+}
+function sv(tag, attr = {}) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attr) e.setAttribute(k, attr[k]);
+  return e;
+}
+function tasto(testo, azione, cls = 'tasto') {
+  const b = el('button', cls, testo);
+  b.type = 'button';
+  b.addEventListener('click', azione);
+  return b;
+}
+// angolo in gradi da mezzogiorno, in senso orario
+const punto = (a, r) => [+(Math.sin(a * Math.PI / 180) * r).toFixed(2), +(-Math.cos(a * Math.PI / 180) * r).toFixed(2)];
+
+let idGrad = 0;
+function paesaggio(pal, seme) {
+  const W = 300, H = 160;
+  const s = sv('svg', { viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'xMidYMid slice', 'aria-hidden': 'true' });
+  const id = 'cielo' + idGrad++;
+  const grad = sv('linearGradient', { id, x1: 0, y1: 0, x2: 0, y2: 1 });
+  pal.cielo.forEach((c, i, a) => grad.append(sv('stop', { offset: i / (a.length - 1), 'stop-color': c })));
+  const defs = sv('defs');
+  defs.append(grad);
+  s.append(defs, sv('rect', { width: W, height: H, fill: `url(#${id})` }));
+  let n = seme;
+  const rnd = () => (n = (n * 9301 + 49297) % 233280) / 233280;
+  if (pal.stelle) {
+    for (let i = 0; i < 40; i++) s.append(sv('circle', { cx: (rnd() * W).toFixed(1), cy: (rnd() * H * .45).toFixed(1), r: (.3 + rnd() * .6).toFixed(2), fill: '#fff', opacity: .7 }));
+  }
+  s.append(sv('circle', { cx: W * .5, cy: H * .5, r: 13, fill: pal.astro, opacity: .92 }));
+  pal.colli.forEach((c, k) => {
+    const base = H * (.6 + k * .13), amp = 8 + k * 5;
+    let d = `M0 ${H} L0 ${base}`;
+    for (let x = 0; x < W; x += 30) d += ` Q${x + 15} ${(base - amp * 2 * rnd()).toFixed(1)} ${x + 30} ${(base - amp * rnd()).toFixed(1)}`;
+    s.append(sv('path', { d: d + ` L${W} ${H} Z`, fill: c }));
+    if (k === 0) {
+      for (const x of [62, 71, 205]) {
+        const h = 14 + rnd() * 14;
+        s.append(sv('rect', { x, y: base - h, width: 5, height: h + 8, fill: c }));
+        s.append(sv('polygon', { points: `${x - 1.5},${base - h} ${x + 6.5},${base - h} ${x + 2.5},${base - h - 7}`, fill: c }));
+      }
+    }
+  });
+  return s;
+}
+
+function graffa(lato = '') {
+  const g = el('div', 'graffa ' + lato);
+  g.setAttribute('aria-hidden', 'true');
+  const pezzo = d => { const s = sv('svg', { viewBox: '0 0 24 24' }); s.append(sv('path', { d })); return s; };
+  g.append(
+    pezzo('M21 1.5 Q12 1.5 12 10.5 L12 24'), el('span', 'asta'),
+    pezzo('M12 0 Q12 9 3 12 Q12 15 12 24'), el('span', 'asta'),
+    pezzo('M12 0 L12 13.5 Q12 22.5 21 22.5'),
+  );
+  return g;
+}
+
+function illustrazione(b) {
+  const f = el('figure', 'illustrazione');
+  const img = el('img');
+  img.src = '../immagini/' + b.img;
+  img.alt = b.nome;
+  img.addEventListener('error', () => img.replaceWith(el('div', 'riquadro')));
+  f.append(img);
+  return f;
+}
+
+/* ================= Navigazione ================= */
+
+const radice = document.getElementById('scena');
+const ROTTE = ['quadrante', ...SEZIONI.map(s => s.id), ...BESTIE.map((b, i) => 'bestiario/' + i)];
+let corrente = null;
+let scelto = -1;
+let suTasto = null;
+let scheda = null;
+let ingresso = null;
+
+const rotta = () => (ROTTE.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'quadrante');
+function vai(r) {
+  if (location.hash.slice(1) === r) mostra();
+  else location.hash = r;
+}
+
+function mostra() {
+  const [id, n] = rotta().split('/');
+  if (id === 'bestiario' && corrente === 'bestiario') {
+    if (n != null) apriScheda(+n);
+    else chiudiScheda();
+    return;
+  }
+  chiudiScheda(true);
+  suTasto = null;
+  radice.replaceChildren();
+  window.scrollTo(0, 0);
+  if (id === 'quadrante') costruisciQuadrante(false);
+  else costruisciSezione(id);
+  corrente = id;
+  if (n != null) apriScheda(+n, true);
+}
+
+addEventListener('hashchange', mostra);
+addEventListener('keydown', e => {
+  if (ingresso) return fineIngresso();
+  if (e.key === 'Escape') {
+    if (scheda) vai('bestiario');
+    else if (corrente !== 'quadrante') vai('quadrante');
+    return;
+  }
+  if (suTasto) suTasto(e);
+});
+
+/* ================= Ingresso ================= */
+
+function avviaIngresso() {
+  if (location.hash.slice(1) !== 'quadrante') history.replaceState(null, '', '#quadrante');
+  radice.replaceChildren();
+  costruisciQuadrante(true);
+  corrente = 'quadrante';
+  const ov = el('div', 'ingresso');
+  ov.setAttribute('aria-hidden', 'true');
+  const arcate = el('div', 'arcate');
+  for (let i = 0; i < 3; i++) {
+    const a = el('div', 'arcata');
+    a.style.setProperty('--i', i);
+    a.append(paesaggio(PAL_INGRESSO, 7), el('div', 'anta s'), el('div', 'anta d'));
+    arcate.append(a);
+  }
+  ov.append(arcate, el('p', 'ingresso-nome', 'Il Quadrante'));
+  ov.addEventListener('click', fineIngresso);
+  document.body.append(ov);
+  ingresso = { ov, t: setTimeout(fineIngresso, dur(2000)) };
+}
+
+function fineIngresso() {
+  if (!ingresso) return;
+  clearTimeout(ingresso.t);
+  ingresso.ov.remove();
+  ingresso = null;
+  const q = document.querySelector('.da-ingresso');
+  if (q) q.classList.remove('da-ingresso');
+}
+
+/* ================= Quadrante ================= */
+
+function arco(a0, a1, R, r) {
+  const [x0, y0] = punto(a0, R), [x1, y1] = punto(a1, R), [x2, y2] = punto(a1, r), [x3, y3] = punto(a0, r);
+  return `M${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1} L${x2} ${y2} A${r} ${r} 0 0 0 ${x3} ${y3} Z`;
+}
+
+function costruisciQuadrante(daIngresso) {
+  document.body.dataset.fondo = 'notte';
+  const s = el('div', 'schermo quadrante' + (daIngresso ? ' da-ingresso' : ''));
+  const testa = el('header', 'q-testa');
+  testa.append(el('span', 'marchio', 'Il Quadrante'), tasto("Rivedi l'ingresso", avviaIngresso, 'tasto rivedi'));
+
+  const disco = el('div', 'disco');
+  const svg = sv('svg', { viewBox: '-112 -112 224 224', class: 'anello', role: 'group', 'aria-label': 'Sezioni' });
+  const defs = sv('defs');
+  const g = sv('radialGradient', { id: 'carta-anello', gradientUnits: 'userSpaceOnUse', cx: 0, cy: 0, r: 100 });
+  g.append(sv('stop', { offset: .55, 'stop-color': '#efe6d2' }), sv('stop', { offset: 1, 'stop-color': '#d4c5a6' }));
+  defs.append(g);
+  svg.append(defs, sv('circle', { r: 109, class: 'fondo-anello' }));
+  for (let a = 0; a < 360; a += 5) {
+    const [x1, y1] = punto(a, 103), [x2, y2] = punto(a, a % 30 ? 105.5 : 108);
+    svg.append(sv('line', { x1, y1, x2, y2, class: 'tacca' }));
+  }
+
+  const centro = el('div', 'centro');
+  const cNome = el('div', 'centro-nome');
+  const cRiga = el('div', 'centro-riga');
+  const entra = tasto('Entra', () => vai(SEZIONI[scelto].id), 'tasto entra');
+  centro.append(cNome, cRiga, entra);
+
+  function mostraCentro(i) {
+    const sez = SEZIONI[i];
+    // nodi nuovi ogni volta, così la piccola entrata in CSS riparte
+    const n = el('div', 'centro-nome', sez ? sez.nome : 'Il Quadrante');
+    const r = el('div', 'centro-riga', sez ? sez.riga : 'Scegli una sezione.');
+    centro.querySelector('.centro-nome').replaceWith(n);
+    centro.querySelector('.centro-riga').replaceWith(r);
+    const pronto = i >= 0 && i === scelto;
+    entra.disabled = !pronto;
+    entra.classList.toggle('attivo', pronto);
+  }
+  const sbircia = i => { if (scelto < 0) mostraCentro(i); };
+
+  let rot = scelto >= 0 ? -scelto * 60 : 0;
+  disco.style.setProperty('--rot', rot);
+
+  function scegli(i, alTasto) {
+    rot += ((-i * 60 - rot) % 360 + 540) % 360 - 180;
+    disco.style.setProperty('--rot', rot);
+    scelto = i;
+    settori.forEach((x, k) => x.classList.toggle('scelto', k === i));
+    mostraCentro(i);
+    if (alTasto) entra.focus();
+  }
+
+  const settori = SEZIONI.map((sez, i) => {
+    const gr = sv('g', { class: 'settore', tabindex: 0, role: 'button', 'aria-label': sez.nome });
+    gr.append(sv('path', { d: arco(i * 60 - 29, i * 60 + 29, 100, 54) }));
+    const [x, y] = punto(i * 60, 77);
+    const t = sv('text', { x, y, class: 'etichetta', 'text-anchor': 'middle', 'dominant-baseline': 'central' });
+    t.textContent = sez.nome;
+    gr.append(t);
+    const [dx, dy] = punto(i * 60, 5);
+    gr.style.setProperty('--dx', dx + 'px');
+    gr.style.setProperty('--dy', dy + 'px');
+    gr.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') sbircia(i); });
+    gr.addEventListener('pointerleave', () => sbircia(-1));
+    gr.addEventListener('focus', () => sbircia(i));
+    gr.addEventListener('blur', () => sbircia(-1));
+    gr.addEventListener('click', () => (i === scelto ? vai(sez.id) : scegli(i)));
+    gr.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (i === scelto) vai(sez.id);
+        else scegli(i, true);
+      }
+      const passo = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      if (passo) {
+        e.preventDefault();
+        const j = (i + passo + 6) % 6;
+        scegli(j);
+        settori[j].focus();
+      }
+    });
+    svg.append(gr);
+    return gr;
+  });
+
+  if (scelto >= 0) settori[scelto].classList.add('scelto');
+  mostraCentro(scelto);
+  disco.append(svg, centro, el('div', 'indice'));
+  s.append(testa, disco);
+  radice.append(s);
+}
+
+/* ================= Sezioni ================= */
+
+function costruisciSezione(id) {
+  const sez = SEZIONI.find(x => x.id === id);
+  document.body.dataset.fondo = sez.fondo;
+  const s = el('div', 'schermo sezione');
+  const barra = el('header', 'barra');
+  barra.append(tasto('← Quadrante', () => vai('quadrante')), el('span', 'barra-titolo', sez.nome), el('span'));
+  const pag = el('main', 'pagina');
+  if (id !== 'mappe' && id !== 'avventure') {
+    pag.append(el('h1', 'titolo-sezione', sez.nome), el('p', 'provvisorio', 'Testi provvisori, da sostituire.'));
+  }
+  pag.append(COSTRUTTORI[id]());
+  s.append(barra, pag);
+  radice.append(s);
+}
+
+const COSTRUTTORI = {
+  bestiario() {
+    const elenco = el('div', 'elenco');
+    BESTIE.forEach((b, i) => {
+      const a = el('a', 'voce');
+      a.href = '#bestiario/' + i;
+      const corpo = el('div', 'corpo');
+      const t = el('div', 'testo');
+      t.append(el('h2', '', b.nome), el('p', 'tipo', 'Tipo da definire'), el('p', 'breve', BREVE), el('span', 'leggi', 'Apri la scheda →'));
+      corpo.append(illustrazione(b), t);
+      a.append(graffa(), corpo, graffa('destra'));
+      elenco.append(a);
+    });
+    return elenco;
+  },
+
+  personaggi() {
+    const gal = el('div', 'galleria');
+    PERSONAGGI.forEach(p => {
+      const c = el('article', 'personaggio');
+      const cornice = el('div', 'ritratto-cornice');
+      const raggi = sv('svg', { viewBox: '-100 -100 200 200', class: 'raggi', 'aria-hidden': 'true' });
+      for (let a = 0; a < 360; a += 10) {
+        const [x1, y1] = punto(a, 58), [x2, y2] = punto(a, a % 30 ? 82 : 98);
+        raggi.append(sv('line', { x1, y1, x2, y2 }));
+      }
+      const ritratto = el('div', 'ritratto');
+      ritratto.style.setProperty('--tinta', p.tinta);
+      cornice.append(raggi, ritratto);
+      c.append(cornice, el('h2', '', p.nome), el('p', 'ruolo', p.ruolo));
+      for (const [titolo, testo] of BLOCCHI_PERSONAGGIO) {
+        const d = el('details');
+        d.append(el('summary', '', titolo), el('p', '', testo));
+        c.append(d);
+      }
+      gal.append(c);
+    });
+    return gal;
+  },
+
+  lore() {
+    const wrap = el('div', 'lore-layout');
+    const nav = el('nav', 'indice-lore');
+    nav.setAttribute('aria-label', 'Voci della lore');
+    const colonna = el('div');
+    const vaiA = id => document.getElementById('lore-' + id).scrollIntoView({ behavior: meno.matches ? 'auto' : 'smooth' });
+    const bottoni = {};
+    const osserva = new IntersectionObserver(voci => voci.forEach(v => {
+      if (!v.isIntersecting) return;
+      for (const k in bottoni) bottoni[k].classList.toggle('attiva', 'lore-' + k === v.target.id);
+    }), { rootMargin: '-15% 0px -70% 0px' });
+    LORE.forEach(v => {
+      bottoni[v.id] = tasto(v.titolo, () => vaiA(v.id), 'voce-indice');
+      nav.append(bottoni[v.id]);
+      const art = el('article', 'voce-lore');
+      art.id = 'lore-' + v.id;
+      art.append(el('h2', '', v.titolo));
+      for (const par of v.testo) {
+        const p = el('p');
+        for (const pz of par) p.append(typeof pz === 'string' ? pz : tasto(pz.t, () => vaiA(pz.ref), 'rimando'));
+        art.append(p);
+      }
+      colonna.append(art);
+      osserva.observe(art);
+    });
+    wrap.append(nav, colonna);
+    return wrap;
+  },
+
+  avventure() {
+    const box = el('div');
+    const pagina = el('section', 'avv');
+    const conta = el('span', 'avv-conta');
+    let k = 0;
+    function disegna() {
+      const a = AVVENTURE[k];
+      const c = el('div', 'avv-contenuto');
+      const meta = el('dl', 'avv-meta');
+      for (const [e, v] of a.meta) {
+        const d = el('div');
+        d.append(el('dt', '', e), el('dd', '', v));
+        meta.append(d);
+      }
+      c.append(el('p', 'avv-num', a.num), el('h2', 'avv-titolo', a.titolo), el('p', 'avv-gancio', a.gancio), meta);
+      pagina.replaceChildren(c);
+      conta.textContent = `${k + 1} / ${AVVENTURE.length}`;
+      return c;
+    }
+    function passa(d) {
+      k = (k + d + AVVENTURE.length) % AVVENTURE.length;
+      disegna().animate([{ opacity: 0, transform: `translateX(${d * 32}px)` }, { opacity: 1, transform: 'none' }], { duration: dur(240), easing: RAPIDO });
+    }
+    const prec = tasto('←', () => passa(-1));
+    const succ = tasto('→', () => passa(1));
+    prec.setAttribute('aria-label', 'Avventura precedente');
+    succ.setAttribute('aria-label', 'Avventura successiva');
+    const nav = el('div', 'avv-nav');
+    nav.append(prec, conta, succ);
+    disegna();
+    box.append(pagina, nav);
+    suTasto = e => {
+      if (e.key === 'ArrowRight') passa(1);
+      if (e.key === 'ArrowLeft') passa(-1);
+    };
+    return box;
+  },
+
+  meccaniche() {
+    const wrap = el('div');
+    const favo = el('div', 'favo');
+    const linee = sv('svg', { viewBox: '0 0 100 88', preserveAspectRatio: 'none', 'aria-hidden': 'true' });
+    const W = 27, H = W * 1.1547, D = W * 1.16;
+    const pos = {};
+    for (const c of CELLE) {
+      const r = c.a == null ? 0 : D, a = (c.a || 0) * Math.PI / 180;
+      pos[c.id] = [50 + r * Math.cos(a), 44 + r * Math.sin(a)];
+    }
+    const linea = {};
+    for (const c of CELLE) for (const d of c.sblocca) {
+      linea[c.id + '>' + d] = sv('line', { x1: pos[c.id][0], y1: pos[c.id][1], x2: pos[d][0], y2: pos[d][1] });
+      linee.append(linea[c.id + '>' + d]);
+    }
+    favo.append(linee);
+    const info = el('div', 'sblocchi');
+    info.setAttribute('aria-live', 'polite');
+    const celle = {};
+    function accendi(c) {
+      favo.classList.toggle('attivo', !!c);
+      for (const id in celle) {
+        celle[id].classList.toggle('accesa', !!c && c.id === id);
+        celle[id].classList.toggle('sbloccata', !!c && c.sblocca.includes(id));
+      }
+      for (const k in linea) linea[k].classList.toggle('accesa', !!c && k.startsWith(c.id + '>'));
+      if (!c) return info.replaceChildren(el('p', 'sblocchi-vuoto', 'Passa sopra una cella, o toccala, per vedere cosa sblocca.'));
+      const nomi = c.sblocca.map(id => CELLE.find(x => x.id === id).nome);
+      info.replaceChildren(el('h3', '', c.nome), el('p', '', c.descr), el('p', 'sblocchi-riga', nomi.length ? 'Sblocca: ' + nomi.join(', ') : 'Non sblocca altro.'));
+    }
+    for (const c of CELLE) {
+      const b = el('button', 'cella');
+      b.type = 'button';
+      b.style.left = (pos[c.id][0] - W / 2) + '%';
+      b.style.top = ((pos[c.id][1] - H / 2) / 88 * 100) + '%';
+      b.append(el('span', 'cella-int', c.nome));
+      b.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') accendi(c); });
+      b.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') accendi(null); });
+      b.addEventListener('click', () => accendi(c));
+      b.addEventListener('focus', () => accendi(c));
+      b.addEventListener('blur', () => accendi(null));
+      celle[c.id] = b;
+      favo.append(b);
+    }
+    accendi(null);
+    wrap.append(favo, info);
+    return wrap;
+  },
+
+  mappe() {
+    const box = el('div', 'mappe');
+    const cerchio = el('div', 'titolo-cerchio');
+    const raggi = sv('svg', { viewBox: '-800 -800 1600 1600', class: 'raggi-mappa', 'aria-hidden': 'true' });
+    for (let a = 0; a < 360; a += 12) {
+      const [x1, y1] = punto(a, 150), [x2, y2] = punto(a, 800);
+      raggi.append(sv('line', { x1, y1, x2, y2 }));
+    }
+    for (const r of [190, 320, 520]) raggi.append(sv('circle', { r }));
+    cerchio.append(raggi, el('h1', '', 'Mappe'), el('p', '', 'Atlante provvisorio'));
+    const vedute = el('div', 'vedute');
+    for (const v of VEDUTE) {
+      const f = el('figure', 'veduta ' + v.forma);
+      const fin = el('div', 'finestra');
+      fin.append(paesaggio(v.pal, v.seme));
+      const cap = el('figcaption');
+      cap.append(el('b', '', v.nome), el('span', '', v.riga));
+      f.append(fin, cap);
+      vedute.append(f);
+    }
+    box.append(cerchio, vedute);
+    return box;
+  },
+};
+
+/* ================= Bestiario: scheda ================= */
+
+const rettangolo = r => `translate(${r.left}px, ${r.top}px) scale(${r.width / innerWidth}, ${r.height / innerHeight})`;
+
+function apriScheda(n, istantanea) {
+  if (scheda) return riempiScheda(n, true);
+  const strato = el('div', 'scheda-strato');
+  strato.setAttribute('role', 'dialog');
+  strato.setAttribute('aria-modal', 'true');
+  const barra = el('header', 'barra');
+  const conta = el('span', 'barra-titolo');
+  const indietro = tasto('← Elenco', () => vai('bestiario'));
+  barra.append(indietro, conta, tasto('Successiva →', () => vai('bestiario/' + (scheda.n + 1) % BESTIE.length)));
+  const corpo = el('div');
+  const int = el('div', 'scheda-int');
+  int.append(graffa(), corpo, graffa('destra'));
+  strato.append(barra, int);
+  scheda = { strato, corpo, conta, n };
+  riempiScheda(n, false);
+  suTasto = e => { if (e.key === 'ArrowRight') vai('bestiario/' + (scheda.n + 1) % BESTIE.length); };
+
+  if (istantanea) {
+    document.body.append(strato);
+    return indietro.focus({ preventScroll: true });
+  }
+  const voce = document.querySelectorAll('.voce')[n];
+  voce.classList.add('scelta');
+  voce.parentElement.classList.add('apertura');
+  setTimeout(() => {
+    if (!scheda || scheda.strato !== strato) return;
+    document.body.append(strato);
+    strato.animate([{ transform: rettangolo(voce.getBoundingClientRect()), opacity: .4 }, { transform: 'none', opacity: 1 }], { duration: dur(380), easing: RAPIDO });
+    indietro.focus({ preventScroll: true });
+  }, dur(220));
+}
+
+function riempiScheda(n, animata) {
+  scheda.n = n;
+  const b = BESTIE[n];
+  scheda.conta.textContent = `${n + 1} / ${BESTIE.length}`;
+  scheda.strato.setAttribute('aria-label', b.nome);
+  const c = el('article', 'scheda-contenuto');
+  const testa = el('div', 'scheda-testa');
+  const destra = el('div');
+  const pannello = el('dl', 'pannello');
+  const dati = [['Tipo', 'Da definire'], ['Habitat', 'Da definire'], ['Taglia', 'Media'], ['Pericolo', b.pericolo], ['Attività', 'Da definire'], ['Prima comparsa', '—']];
+  for (const [e, v] of dati) pannello.append(el('dt', '', e), el('dd', '', v));
+  destra.append(el('h1', '', b.nome), el('p', 'tipo', 'Tipo da definire · testi provvisori'), pannello);
+  testa.append(illustrazione(b), destra);
+  const lore = el('div', 'lore-scheda');
+  for (const p of loreDi(b.nome)) lore.append(el('p', '', p));
+  c.append(testa, lore);
+  scheda.corpo.replaceChildren(c);
+  if (animata) {
+    scheda.strato.scrollTo(0, 0);
+    c.animate([{ opacity: 0, transform: 'translateX(28px)' }, { opacity: 1, transform: 'none' }], { duration: dur(220), easing: RAPIDO });
+  }
+}
+
+function chiudiScheda(istantanea) {
+  if (!scheda) return;
+  const { strato, n } = scheda;
+  scheda = null;
+  suTasto = null;
+  const voci = document.querySelectorAll('.voce');
+  const voce = voci[n];
+  const fine = () => {
+    strato.remove();
+    const elenco = document.querySelector('.elenco');
+    if (elenco) elenco.classList.remove('apertura');
+    voci.forEach(v => v.classList.remove('scelta'));
+    if (voce && voce.isConnected) voce.focus({ preventScroll: true });
+  };
+  if (istantanea || !voce) return fine();
+  voci.forEach(v => v.classList.toggle('scelta', v === voce));
+  voce.scrollIntoView({ block: 'center' });
+  strato.animate([{ transform: 'none', opacity: 1 }, { transform: rettangolo(voce.getBoundingClientRect()), opacity: 0 }], { duration: dur(300), easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'forwards' }).onfinish = fine;
+}
+
+/* ================= Avvio ================= */
+
+if (location.hash) mostra();
+else avviaIngresso();
+</script>
+</body>
+</html>
