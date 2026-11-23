@@ -1,0 +1,53 @@
+[
+  {
+    "nome": "Strigora",
+    "tipo": "predatore notturno, grande",
+    "immagine": "immagini/kipine.jpg",
+    "breve": "Caccia solo nelle notti senza luna, quando il buio è abbastanza fitto da nasconderne le ali. Chi l'ha vista da vicino parla di un fruscio sopra i tetti, poi di un silenzio improvviso: i cani smettono di abbaiare, le lanterne tremano. Al mattino, nei villaggi di confine, si contano le pecore e qualche volta le persone. I vecchi dicono che sceglie la preda giorni prima, e che la segue di casa in casa aspettando che resti sola.",
+    "paragrafi": [
+      "Caccia solo nelle notti senza luna, quando il buio è abbastanza fitto da nasconderne le ali. Chi l'ha vista da vicino parla di un fruscio sopra i tetti, poi di un silenzio improvviso.",
+      "I vecchi dei villaggi di confine dicono che sceglie la preda giorni prima e che la segue di casa in casa, aspettando che resti sola. Per questo nessuno, d'inverno, esce senza compagnia.",
+      "Le sue penne cadute non bruciano. Qualcuno le vende ai mercati come amuleti; nessuno che le abbia comprate è mai tornato a dire se funzionano."
+    ],
+    "dettagli": [
+      ["Habitat", "Valli di confine, campanili abbandonati"],
+      ["Attività", "Notti senza luna"],
+      ["Pericolo", "Alto"],
+      ["Debolezza", "Fuoco vivo, rumore improvviso"]
+    ]
+  },
+  {
+    "nome": "Rovaglia",
+    "tipo": "agguato, grande",
+    "immagine": "immagini/flurry.jpg",
+    "breve": "Si stende sotto la neve fresca e aspetta, a volte per settimane, immobile come un cumulo qualsiasi lungo il sentiero. Il primo segno è una conca nel manto bianco che non dovrebbe esserci; il secondo, quasi sempre, arriva troppo tardi. Le guide di montagna la riconoscono dall'odore di ferro freddo che lascia nell'aria e insegnano ai viandanti a camminare lontano dai mucchi troppo regolari.",
+    "paragrafi": [
+      "Si stende sotto la neve fresca e aspetta, a volte per settimane, immobile come un cumulo qualsiasi lungo il sentiero. Il primo segno è una conca nel manto bianco che non dovrebbe esserci.",
+      "Le guide di montagna la riconoscono dall'odore di ferro freddo che lascia nell'aria. Insegnano ai viandanti a camminare lontano dai mucchi troppo regolari e a non fermarsi mai a riposare sulla neve intatta.",
+      "In primavera, quando il disgelo la scopre, si ritira nei crepacci e dorme. Chi trova una tana vuota trova anche, di solito, quello che resta dell'inverno precedente."
+    ],
+    "dettagli": [
+      ["Habitat", "Passi alpini, sentieri innevati"],
+      ["Attività", "Inverno, dopo le nevicate"],
+      ["Pericolo", "Alto"],
+      ["Debolezza", "Sale, terreno scoperto"]
+    ]
+  },
+  {
+    "nome": "Il Digiuno",
+    "tipo": "non morto, grande",
+    "immagine": "immagini/vrykolakas.jpg",
+    "breve": "Torna dalla tomba con una fame che nessun pasto riempie. Bussa alle porte di chi lo ha conosciuto in vita e chiama per nome, con la voce di prima, finché qualcuno non apre. Dove passa, il pane ammuffisce nella notte e il latte cagliato si fa nero. I preti dei paesi di montagna tengono un registro dei morti mal sepolti, e quando le porte cominciano a sentire bussare sanno già da quale nome partire.",
+    "paragrafi": [
+      "Torna dalla tomba con una fame che nessun pasto riempie. Bussa alle porte di chi lo ha conosciuto in vita e chiama per nome, con la voce di prima, finché qualcuno non apre.",
+      "Dove passa, il pane ammuffisce nella notte e il latte si fa nero. I preti dei paesi di montagna tengono un registro dei morti mal sepolti, e quando le porte cominciano a sentire bussare sanno già da quale nome partire.",
+      "Non entra dove non è invitato. Il guaio è che quasi tutti, prima o poi, lo invitano: la voce è quella giusta, e la notte è lunga."
+    ],
+    "dettagli": [
+      ["Habitat", "Cimiteri di paese, case dei parenti"],
+      ["Attività", "Notte, dal terzo giorno dopo la sepoltura"],
+      ["Pericolo", "Molto alto"],
+      ["Debolezza", "Soglia non varcata, sepoltura rifatta"]
+    ]
+  }
+]

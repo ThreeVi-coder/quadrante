@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bestiario — Il Quadrante</title>
+  <link rel="stylesheet" href="stile/base.css">
+  <link rel="stylesheet" href="stile/bestiario.css">
+</head>
+<body>
+  <header class="testata"><h1>Bestiario</h1></header>
+  <main class="elenco"></main>
+
+  <template id="voce">
+    <article class="voce">
+      <svg class="graffa" viewBox="0 0 20 100" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M18 0C10 0 10 6 10 14V40C10 46 8 50 2 50C8 50 10 54 10 60V86C10 94 10 100 18 100"/>
+      </svg>
+      <img alt="">
+      <div class="testo">
+        <h2></h2>
+        <p></p>
+      </div>
+      <svg class="graffa graffa-d" viewBox="0 0 20 100" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M18 0C10 0 10 6 10 14V40C10 46 8 50 2 50C8 50 10 54 10 60V86C10 94 10 100 18 100"/>
+      </svg>
+    </article>
+  </template>
+
+  <script>
+    fetch('dati/bestiario.json').then(r => r.json()).then(creature => {
+      const modello = document.getElementById('voce').content;
+      for (const c of creature) {
+        const voce = modello.cloneNode(true);
+        const img = voce.querySelector('img');
+        // http(s) o percorso relativo; scarta ogni altro schema (javascript:, data:…)
+        if (/^https?:\/\//i.test(c.immagine) || !/^[^/]*:/.test(c.immagine)) img.src = c.immagine;
+        voce.querySelector('h2').textContent = c.nome;
+        voce.querySelector('p').textContent = c.breve;
+        document.querySelector('.elenco').append(voce);
+      }
+    });
+  </script>
+</body>
+</html>
